@@ -2,6 +2,7 @@ package io
 
 import (
 	"fmt"
+	"os"
 
 	"gx/ipfs/QmZy2y8t9zQH2a1b8q2ZSLKp17ATuJoCNxxyMFG5qFExpt/go-net/context"
 
@@ -109,8 +110,12 @@ func (d *Directory) Links() ([]*mdag.Link, error) {
 func (d *Directory) Find(ctx context.Context, name string) (*mdag.Node, error) {
 	if d.shard == nil {
 		lnk, err := d.dirnode.GetNodeLink(name)
-		if err != nil {
+		switch err {
+		case mdag.ErrLinkNotFound:
+			return nil, os.ErrNotExist
+		default:
 			return nil, err
+		case nil:
 		}
 
 		return d.dserv.Get(ctx, key.Key(lnk.Hash))

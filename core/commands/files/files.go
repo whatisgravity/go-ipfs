@@ -342,7 +342,13 @@ Examples:
 		case *mfs.Directory:
 			if !long {
 				var output []mfs.NodeListing
-				for _, name := range fsn.ListNames() {
+				names, err := fsn.ListNames()
+				if err != nil {
+					res.SetError(err, cmds.ErrNormal)
+					return
+				}
+
+				for _, name := range names {
 					output = append(output, mfs.NodeListing{
 						Name: name,
 					})

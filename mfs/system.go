@@ -91,7 +91,11 @@ func NewRoot(parent context.Context, ds dag.DAGService, node *dag.Node, pf PubFu
 
 	switch pbn.GetType() {
 	case ft.TDirectory:
-		root.val = NewDirectory(parent, ndk.String(), node, root, ds)
+		rdir, err := NewDirectory(parent, ndk.String(), node, root, ds)
+		if err != nil {
+			return nil, err
+		}
+		root.val = rdir
 	case ft.TFile, ft.TMetadata, ft.TRaw:
 		fi, err := NewFile(ndk.String(), node, root, ds)
 		if err != nil {
