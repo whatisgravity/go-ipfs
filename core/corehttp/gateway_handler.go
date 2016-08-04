@@ -21,6 +21,7 @@ import (
 	dagutils "github.com/ipfs/go-ipfs/merkledag/utils"
 	path "github.com/ipfs/go-ipfs/path"
 	"github.com/ipfs/go-ipfs/routing"
+	ft "github.com/ipfs/go-ipfs/unixfs"
 	uio "github.com/ipfs/go-ipfs/unixfs/io"
 )
 
@@ -342,7 +343,7 @@ func (i *gatewayHandler) putHandler(w http.ResponseWriter, r *http.Request) {
 
 	var newnode *dag.Node
 	if rsegs[len(rsegs)-1] == "QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn" {
-		newnode = uio.NewEmptyDirectory()
+		newnode = ft.EmptyDirNode()
 	} else {
 		putNode, err := i.newDagFromReader(r.Body)
 		if err != nil {
@@ -371,7 +372,7 @@ func (i *gatewayHandler) putHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		e := dagutils.NewDagEditor(rnode, i.node.DAG)
-		err = e.InsertNodeAtPath(ctx, newPath, newnode, uio.NewEmptyDirectory)
+		err = e.InsertNodeAtPath(ctx, newPath, newnode, ft.EmptyDirNode)
 		if err != nil {
 			webError(w, "putHandler: InsertNodeAtPath failed", err, http.StatusInternalServerError)
 			return
