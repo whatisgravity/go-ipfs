@@ -270,8 +270,13 @@ func pinLsKeys(args []string, typeStr string, ctx context.Context, n *core.IpfsN
 
 	keys := make(map[string]RefKeyObject)
 
-	for _, p := range args {
-		dagNode, err := core.Resolve(ctx, n, path.Path(p))
+	for _, sp := range args {
+		p, err := path.ParsePath(sp)
+		if err != nil {
+			return nil, err
+		}
+
+		dagNode, err := core.Resolve(ctx, n.Namesys, n.Resolver, p)
 		if err != nil {
 			return nil, err
 		}

@@ -12,6 +12,7 @@ import (
 	merkledag "github.com/ipfs/go-ipfs/merkledag"
 	path "github.com/ipfs/go-ipfs/path"
 	unixfs "github.com/ipfs/go-ipfs/unixfs"
+	uio "github.com/ipfs/go-ipfs/unixfs/io"
 	unixfspb "github.com/ipfs/go-ipfs/unixfs/pb"
 )
 
@@ -81,7 +82,13 @@ Example:
 
 		for _, fpath := range paths {
 			ctx := req.Context()
-			merkleNode, err := core.Resolve(ctx, node, path.Path(fpath))
+
+			resolver := &path.Resolver{
+				DAG:         node.DAG,
+				ResolveOnce: uio.ResolveUnixfsOnce,
+			}
+
+			merkleNode, err := core.Resolve(ctx, node.Namesys, resolver, path.Path(fpath))
 			if err != nil {
 				res.SetError(err, cmds.ErrNormal)
 				return

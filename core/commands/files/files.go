@@ -15,6 +15,7 @@ import (
 	mfs "github.com/ipfs/go-ipfs/mfs"
 	path "github.com/ipfs/go-ipfs/path"
 	ft "github.com/ipfs/go-ipfs/unixfs"
+	uio "github.com/ipfs/go-ipfs/unixfs/io"
 
 	logging "gx/ipfs/QmNQynaz7qfriSUJkiEZUrm2Wen1u3Kj9goZzWtrPyu7XR/go-log"
 	context "gx/ipfs/QmZy2y8t9zQH2a1b8q2ZSLKp17ATuJoCNxxyMFG5qFExpt/go-net/context"
@@ -259,7 +260,12 @@ func getNodeFromPath(ctx context.Context, node *core.IpfsNode, p string) (*dag.N
 			return nil, err
 		}
 
-		return core.Resolve(ctx, node, np)
+		resolver := &path.Resolver{
+			DAG:         node.DAG,
+			ResolveOnce: uio.ResolveUnixfsOnce,
+		}
+
+		return core.Resolve(ctx, node.Namesys, resolver, np)
 	default:
 		fsn, err := mfs.Lookup(node.FilesRoot, p)
 		if err != nil {

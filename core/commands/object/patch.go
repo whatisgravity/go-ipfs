@@ -73,7 +73,7 @@ the limit will not be respected by the network.
 			return
 		}
 
-		rootnd, err := core.Resolve(req.Context(), nd, root)
+		rootnd, err := core.Resolve(req.Context(), nd.Namesys, nd.Resolver, root)
 		if err != nil {
 			res.SetError(err, cmds.ErrNormal)
 			return
@@ -135,7 +135,7 @@ Example:
 			return
 		}
 
-		root, err := core.Resolve(req.Context(), nd, rp)
+		root, err := core.Resolve(req.Context(), nd.Namesys, nd.Resolver, rp)
 		if err != nil {
 			res.SetError(err, cmds.ErrNormal)
 			return
@@ -193,7 +193,7 @@ Removes a link by the given name from root.
 			return
 		}
 
-		root, err := core.Resolve(req.Context(), nd, rootp)
+		root, err := core.Resolve(req.Context(), nd.Namesys, nd.Resolver, rootp)
 		if err != nil {
 			res.SetError(err, cmds.ErrNormal)
 			return
@@ -266,7 +266,7 @@ to a file containing 'bar', and returns the hash of the new object.
 			return
 		}
 
-		root, err := core.Resolve(req.Context(), nd, rootp)
+		root, err := core.Resolve(req.Context(), nd.Namesys, nd.Resolver, rootp)
 		if err != nil {
 			res.SetError(err, cmds.ErrNormal)
 			return
@@ -292,7 +292,7 @@ to a file containing 'bar', and returns the hash of the new object.
 
 		e := dagutils.NewDagEditor(root, nd.DAG)
 
-		childnd, err := core.Resolve(req.Context(), nd, childp)
+		childnd, err := core.Resolve(req.Context(), nd.Namesys, nd.Resolver, childp)
 		if err != nil {
 			res.SetError(err, cmds.ErrNormal)
 			return

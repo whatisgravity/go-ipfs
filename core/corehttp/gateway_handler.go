@@ -153,7 +153,13 @@ func (i *gatewayHandler) getOrHeadHandler(w http.ResponseWriter, r *http.Request
 		ipnsHostname = true
 	}
 
-	nd, err := core.Resolve(ctx, i.node, path.Path(urlPath))
+	p, err := path.ParsePath(urlPath)
+	if err != nil {
+		webError(w, "Invalid Path Error", err, http.StatusBadRequest)
+		return
+	}
+
+	nd, err := core.Resolve(ctx, i.node.Namesys, i.node.Resolver, p)
 	// If node is in offline mode the error code and message should be different
 	if err == core.ErrNoNamesys && !i.node.OnlineMode() {
 		w.WriteHeader(http.StatusServiceUnavailable)
@@ -234,8 +240,14 @@ func (i *gatewayHandler) getOrHeadHandler(w http.ResponseWriter, r *http.Request
 				return
 			}
 
+			p, err := path.ParsePath(urlPath + "/index.html")
+			if err != nil {
+				internalWebError(w, err)
+				return
+			}
+
 			// return index page instead.
-			nd, err := core.Resolve(ctx, i.node, path.Path(urlPath+"/index.html"))
+			nd, err := core.Resolve(ctx, i.node.Namesys, i.node.Resolver, p)
 			if err != nil {
 				internalWebError(w, err)
 				return
@@ -359,7 +371,7 @@ func (i *gatewayHandler) putHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var newkey key.Key
-	rnode, err := core.Resolve(ctx, i.node, rootPath)
+	rnode, err := core.Resolve(ctx, i.node.Namesys, i.node.Resolver, rootPath)
 	switch ev := err.(type) {
 	case path.ErrNoLink:
 		// ev.Node < node where resolve failed
@@ -417,7 +429,13 @@ func (i *gatewayHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithCancel(i.node.Context())
 	defer cancel()
 
-	ipfsNode, err := core.Resolve(ctx, i.node, path.Path(urlPath))
+	p, err := path.ParsePath(urlPath)
+	if err != nil {
+		webError(w, "Invalid path", err, http.StatusBadRequest)
+		return
+	}
+
+	ipfsNode, err := core.Resolve(ctx, i.node.Namesys, i.node.Resolver, p)
 	if err != nil {
 		// FIXME HTTP error code
 		webError(w, "Could not resolve name", err, http.StatusInternalServerError)
