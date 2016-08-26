@@ -12,6 +12,8 @@ import (
 	"github.com/ipfs/go-ipfs/core"
 	"github.com/ipfs/go-ipfs/core/coreunix"
 	uio "github.com/ipfs/go-ipfs/unixfs/io"
+
+	_ "dir-index-html-v1.0.0"
 )
 
 // initDocPaths lists the paths for the docs we want to seed during --init
